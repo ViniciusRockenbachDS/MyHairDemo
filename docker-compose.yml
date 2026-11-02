@@ -1,0 +1,30 @@
+# =============================================================================
+# Jo Fashion Hair - Banco de dados (PostgreSQL)
+# Uso:  docker compose up -d
+# Em produção, defina DB_PASSWORD com uma senha forte (a padrão é só para testes).
+# =============================================================================
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: jofashion-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-jofashion}
+      POSTGRES_USER: ${DB_USER:-jofashion}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-jofashion_dev}
+      TZ: America/Sao_Paulo
+      PGTZ: America/Sao_Paulo
+    ports:
+      # 127.0.0.1 = o banco só aceita conexões do próprio computador/servidor,
+      # nunca da internet. Não troque para "5432:5432".
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - jofashion_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-jofashion} -d ${DB_NAME:-jofashion}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  jofashion_pgdata:

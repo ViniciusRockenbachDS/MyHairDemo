@@ -1,0 +1,307 @@
+/* =============================================================================
+   Jo Fashion Hair — base visual (site e painel)
+   Estilo: preto + laranja + cinza, títulos em Playfair Display
+   ========================================================================== */
+:root {
+  /* Paleta: preto + laranja + cinza */
+  --preto: #111113;           /* seções escuras */
+  --preto-2: #1d1d21;         /* cartões sobre o preto */
+  --preto-linha: rgba(255, 255, 255, 0.09);
+  --laranja: #f26b1d;         /* botões e ícones */
+  --laranja-claro: #ff9a5c;
+  --laranja-texto: #c2410c;   /* laranja legível sobre o cinza claro */
+  --cinza-claro: #f4f4f5;     /* fundo das seções claras */
+  --cinza-claro-2: #e8e8eb;
+
+  --tinta: #18181b;
+  --tinta-suave: #5f5f68;
+  --papel: #ffffff;
+  --linha: #e1e1e6;
+
+  /* nomes usados pelo painel */
+  --marca: var(--laranja);
+  --marca-escura: var(--preto);
+  --destaque: #fde3d3;
+  --destaque-claro: #fff1e8;
+  --fundo: var(--cinza-claro);
+
+  --sucesso: #2f6b4f;
+  --sucesso-fundo: #e5f1ea;
+  --alerta: #8a5410;
+  --alerta-fundo: #fbefdc;
+  --erro: #a3283a;
+  --erro-fundo: #f9e3e6;
+
+  --fonte-titulo: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --fonte-texto: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --raio-pequeno: 8px;
+  --raio: 14px;
+  --raio-grande: 20px;
+  --sombra-cartao: 0 1px 2px rgba(17, 17, 19, 0.05), 0 18px 40px -20px rgba(17, 17, 19, 0.35);
+  --largura: 1180px;
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* espaço do cabeçalho fixo: a seção não fica escondida atrás dele */
+  scroll-padding-top: 96px;
+  /* clicar num link do menu desliza até a seção (desligado para quem pede menos movimento) */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--fonte-titulo);
+  font-weight: 500;
+  line-height: 1.12;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--laranja-texto);
+  text-underline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--laranja);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- botões */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 46px;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, filter 0.15s;
+  white-space: nowrap;
+}
+
+.botao svg {
+  width: 18px;
+  height: 18px;
+}
+
+.botao:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.botao-primario {
+  background: linear-gradient(100deg, #e85d10 0%, #ff8a45 45%, #f26b1d 72%, #e85d10 100%);
+  color: var(--tinta);
+}
+
+.botao-primario:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+
+.botao-secundario {
+  background: transparent;
+  border-color: #cfcfd6;
+  color: var(--tinta);
+}
+
+.botao-secundario:hover:not(:disabled) {
+  background: var(--destaque-claro);
+}
+
+.botao-claro {
+  background: #fff;
+  color: var(--tinta);
+  border-color: var(--linha);
+}
+
+.botao-claro:hover {
+  background: var(--destaque-claro);
+}
+
+.botao-perigo {
+  background: transparent;
+  border-color: var(--erro);
+  color: var(--erro);
+}
+
+.botao-perigo:hover:not(:disabled) {
+  background: var(--erro-fundo);
+}
+
+.botao-largo {
+  width: 100%;
+}
+
+.botao-texto {
+  background: none;
+  border: 0;
+  padding: 0.25rem 0;
+  color: var(--laranja-texto);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.botao-texto:disabled {
+  color: var(--tinta-suave);
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------- formulários */
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.55rem 0.8rem;
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-pequeno);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: #c4c4cc;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--erro);
+}
+
+input[type='checkbox'] {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  accent-color: var(--laranja-texto);
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.campo label,
+.rotulo {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.dica {
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+
+.erro-texto {
+  color: var(--erro);
+  font-size: 0.875rem;
+}
+
+.estado {
+  color: var(--tinta-suave);
+}
+
+.visualmente-oculto {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.carregando-pagina {
+  padding: 3rem;
+  text-align: center;
+  color: var(--tinta-suave);
+}
+
+/* ---------------------------------------------------------------- chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  min-height: 42px;
+  padding: 0.45rem 0.95rem;
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--laranja);
+}
+
+.chip.ativo {
+  background: var(--preto);
+  border-color: var(--preto);
+  color: var(--laranja-claro);
+}
+
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

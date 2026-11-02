@@ -1,0 +1,34 @@
+# Render Blueprint: cria o serviço (Docker) e o banco PostgreSQL gratuito.
+# No Render: New + → Blueprint → escolha o repositório deste projeto.
+services:
+  - type: web
+    name: myhair-demo
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/public/salao
+    envVars:
+      - key: DB_HOST
+        fromDatabase: { name: myhair-demo-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: myhair-demo-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: myhair-demo-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: myhair-demo-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: myhair-demo-db, property: password }
+      # Preencha no painel do Render (não ficam no repositório):
+      - key: ADMIN_EMAIL          # seu e-mail de dono da demonstração
+        sync: false
+      - key: ADMIN_PASSWORD       # sua senha (mínimo 8 caracteres)
+        sync: false
+      - key: DEMO_CHAVE_MESTRA    # palavra secreta para entrar no modo dono (?mestre=...)
+        sync: false
+      - key: DEMO_MAX_VISITANTES
+        value: "25"
+      - key: DEMO_HORAS
+        value: "3"
+
+databases:
+  - name: myhair-demo-db
+    plan: free
