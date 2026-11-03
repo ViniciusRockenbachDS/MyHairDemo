@@ -49,6 +49,17 @@ public class ImagensIniciaisDemo implements ApplicationRunner {
             new String[] {"look-unhas-nude", "Unhas nude"},
             new String[] {"look-make-festa", "Make para festa"});
 
+    /** autor, texto, dias atrás, imagem */
+    private static final List<String[]> AVALIACOES = List.of(
+            new String[] {"Mariana S.", "Atendimento impecável e o agendamento pelo site é muito prático. "
+                    + "Meu corte ficou exatamente como eu queria!", "6", "avaliacao-1"},
+            new String[] {"Juliana R.", "Fiz a hidratação e meus cachos nunca ficaram tão definidos. "
+                    + "Equipe atenciosa e pontual.", "12", "avaliacao-2"},
+            new String[] {"Fernanda L.", "Amei escolher a profissional e o horário pelo celular. "
+                    + "As unhas em gel duraram semanas!", "21", "avaliacao-3"},
+            new String[] {"Camila P.", "Ambiente lindo e acolhedor. Recebi o lembrete no WhatsApp e "
+                    + "confirmei com um toque.", "34", "avaliacao-4"});
+
     static {
         SERVICOS.put("Corte Feminino", "servico-corte-feminino");
         SERVICOS.put("Escova", "servico-escova");
@@ -84,27 +95,47 @@ public class ImagensIniciaisDemo implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        // cada etapa protegida: uma imagem com problema nunca impede o sistema de subir
+        etapa("salão", this::salao);
+        etapa("serviços", () -> SERVICOS.forEach((nome, arq) -> jdbc.update(
+                "UPDATE public.servicos SET foto_url = ? WHERE nome = ? AND foto_url IS NULL", url(arq), nome)));
+        etapa("produtos", () -> PRODUTOS.forEach((nome, arq) -> jdbc.update(
+                "UPDATE public.produtos SET foto_url = ? WHERE nome = ? AND foto_url IS NULL", url(arq), nome)));
+        etapa("equipe", () -> EQUIPE.forEach((nome, arq) -> jdbc.update(
+                "UPDATE public.profissionais SET foto_url = ? WHERE nome = ? AND foto_url IS NULL", url(arq), nome)));
+        etapa("lookbook", this::lookbook);
+        etapa("avaliações", this::avaliacoes);
+        log.info("Demonstração: ilustrações de exemplo prontas");
+    }
+
+    private void etapa(String nome, Runnable acao) {
+        try {
+            acao.run();
+        } catch (RuntimeException e) {
+            log.warn("Demonstração: não foi possível preparar as imagens de {}: {}", nome, e.getMessage());
+        }
+    }
+
+    private void salao() {
         // salão fictício (a demonstração não usa o nome de um cliente real)
         jdbc.update("""
                 UPDATE public.configuracao_salao
                    SET nome = 'Studio Aurora', cidade = 'Florianópolis - SC', instagram = NULL,
                        slogan = COALESCE(slogan, 'Beleza com hora marcada')
                  WHERE id = 1 AND nome = 'Jo Fashion Hair'""");
+        String[][] fotos = {
+                {"logo_url", "salao-logo"},
+                {"foto_hero_url", "salao-fundo-principal"},
+                {"foto_espaco_url", "salao-espaco"},
+                {"foto_visita_url", "salao-fachada"},
+        };
+        for (String[] f : fotos) {
+            jdbc.update("UPDATE public.configuracao_salao SET " + f[0] + " = ? WHERE id = 1 AND " + f[0] + " IS NULL",
+                    url(f[1]));
+        }
+    }
 
-        jdbc.update("UPDATE public.configuracao_salao SET foto_hero_url = ? WHERE id = 1 AND foto_hero_url IS NULL",
-                url("salao-fundo-principal"));
-        jdbc.update("UPDATE public.configuracao_salao SET foto_espaco_url = ? WHERE id = 1 AND foto_espaco_url IS NULL",
-                url("salao-espaco"));
-        jdbc.update("UPDATE public.configuracao_salao SET foto_visita_url = ? WHERE id = 1 AND foto_visita_url IS NULL",
-                url("salao-fachada"));
-
-        SERVICOS.forEach((nome, arq) -> jdbc.update(
-                "UPDATE public.servicos SET foto_url = ? WHERE nome = ? AND foto_url IS NULL", url(arq), nome));
-        PRODUTOS.forEach((nome, arq) -> jdbc.update(
-                "UPDATE public.produtos SET foto_url = ? WHERE nome = ? AND foto_url IS NULL", url(arq), nome));
-        EQUIPE.forEach((nome, arq) -> jdbc.update(
-                "UPDATE public.profissionais SET foto_url = ? WHERE nome = ? AND foto_url IS NULL", url(arq), nome));
-
+    private void lookbook() {
         Integer fotos = jdbc.queryForObject("SELECT COUNT(*) FROM public.lookbook_fotos", Integer.class);
         if (fotos != null && fotos == 0) {
             for (int i = 0; i < LOOKBOOK.size(); i++) {
@@ -112,7 +143,31 @@ public class ImagensIniciaisDemo implements ApplicationRunner {
                         url(LOOKBOOK.get(i)[0]), LOOKBOOK.get(i)[1], i + 1);
             }
         }
-        log.info("Demonstração: ilustrações de exemplo prontas");
+    }
+
+    /** Avaliações de exemplo: sem elas, a seção "Avaliações" fica escondida no site. */
+    private void avaliacoes() {
+        Integer total = jdbc.queryForObject("SELECT COUNT(*) FROM public.avaliacoes", Integer.class);
+        if (total != null && total == 0) {
+            String[][] exemplos = {
+                    {"Mariana S.", "Atendimento impecável! Agendei pelo site em um minuto e recebi o lembrete no WhatsApp. "
+                            + "O corte ficou exatamente como eu queria.", "cliente-mariana", "12"},
+                    {"Juliana R.", "Ambiente lindo e acolhedor. A Bruna é uma artista nas unhas em gel, "
+                            + "duraram mais de três semanas perfeitas.", "cliente-juliana", "25"},
+                    {"Patrícia M.", "Fiz mechas e hidratação e amei o resultado. Pontualidade e cuidado "
+                            + "do começo ao fim. Já marquei o próximo horário!", "cliente-patricia", "40"},
+            };
+            for (int i = 0; i < exemplos.length; i++) {
+                jdbc.update("""
+                        INSERT INTO public.avaliacoes (autor, texto, nota, data, foto_url, ordem)
+                        VALUES (?, ?, 5, CURRENT_DATE - ?, ?, ?)""",
+                        exemplos[i][0], exemplos[i][1], Integer.parseInt(exemplos[i][3]), url(exemplos[i][2]), i + 1);
+            }
+        }
+        jdbc.update("""
+                UPDATE public.configuracao_salao
+                   SET avaliacoes_nota = 4.9, avaliacoes_total = 128
+                 WHERE id = 1 AND avaliacoes_nota IS NULL""");
     }
 
     /** Grava a imagem no banco (uma vez só) e devolve o endereço público dela. */

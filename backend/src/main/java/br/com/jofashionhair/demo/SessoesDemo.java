@@ -75,7 +75,14 @@ public class SessoesDemo implements ApplicationRunner {
         for (int n = 1; n <= maxSessoes; n++) {
             jdbc.update("INSERT INTO public.demo_sessoes (numero) VALUES (?) ON CONFLICT DO NOTHING", n);
         }
-        log.info("Modo demonstração ligado: até {} visitantes ao mesmo tempo, {} h por visita", maxSessoes, horas);
+        // a cada publicação/reinício, todo visitante recebe uma cópia nova dos dados originais
+        // (assim ninguém fica preso a uma versão antiga, sem as novidades)
+        jdbc.update("UPDATE public.demo_sessoes SET sessao = NULL WHERE sessao IS NOT NULL");
+        // Nova versão publicada (ou servidor reiniciado): descarta as cópias antigas para todo visitante
+        // receber os dados atuais (com as imagens e textos mais recentes).
+        int liberadas = jdbc.update("UPDATE public.demo_sessoes SET sessao = NULL WHERE sessao IS NOT NULL");
+        log.info("Modo demonstração ligado: até {} visitantes ao mesmo tempo, {} h por visita ({} cópia(s) antiga(s) descartada(s))",
+                maxSessoes, horas, liberadas);
     }
 
     /** Schema da sessão, se ela existe (e marca o uso, no máximo 1x por minuto). */
