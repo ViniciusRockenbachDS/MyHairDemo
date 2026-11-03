@@ -12,6 +12,9 @@ Cópia do sistema para publicar no Render e deixar qualquer pessoa testar.
   O código de "dispositivo novo" aparece nos **Logs** do Render (linha `[E-MAIL DESLIGADO]`).
 - **Desligado na demonstração**: envio real de WhatsApp e e-mail, lembretes automáticos e Pix do Mercado Pago
   (o sinal funciona no modo manual, com o botão "Sinal recebido").
+- **Ilustrações de exemplo**: na primeira vez que o sistema sobe, serviços, produtos, equipe, Lookbook e fotos
+  do salão recebem ilustrações próprias (pasta `backend/src/main/resources/demo-imagens`). Só são colocadas onde
+  não há imagem: o que você trocar no modo dono continua valendo.
 - **Imagens** ficam guardadas no banco (o disco do plano gratuito do Render é apagado a cada reinício).
 
 ## Variáveis (no painel do Render)
